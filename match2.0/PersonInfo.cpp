@@ -69,7 +69,7 @@ PersonInfoPtr	PersonInfo::selectSatBiggerThanExp(PersonGroupPtr group)
 	PersonGroup::size_type ix;
 	for ( ix=group->size();ix>0;--ix )
 	{
-		int tmpDegree, standard;
+		double tmpDegree, standard;
 		standard	=	at(min_expertation)*1.5;
 		tmpDegree	=	getSatDegree((*group)[ix-1]);
 		if ( tmpDegree>=standard )
@@ -154,7 +154,7 @@ PersonInfoPtr	PersonInfo::selectMinId(PersonGroupPtr group)
 
 PersonGroupPtr  PersonInfo::readFromFile(const std::string & file)
 {
-	PersonGroupPtr	pPersonGroup	=	std::shared_ptr<PersonGroup>(new PersonGroup());
+	PersonGroupPtr	pPersonGroup	=	std::make_shared<PersonGroup>();
 	std::ifstream	fRead;
 	fRead.open(file);
 	if( !fRead.good() )
@@ -162,9 +162,9 @@ PersonGroupPtr  PersonInfo::readFromFile(const std::string & file)
 		std::cout<<"Open file: "<<file<<" failed!"<<std::endl;
 		return NULL;
 	}
-	int id,w,l,c,h,rw,rl,rc,rh,me=0;
 	char t;		//	¶ÁÈ¡·ûºÅ','
 	int info[ITEM_LEN];
+	info[min_expertation]	=	0;
 
 	if( file.find("2_female.txt")!=std::string::npos )
 		info[gender]	=	0;		// female
@@ -211,9 +211,9 @@ PersonGroupPtr	PersonInfo::generateRandomPersons(int num,int gender)
 
 PersonInfoPtr	PersonInfo::generateOnePerson(int id, int gd)
 {
-	int w, l, c, h, rw, rl, rc ,rh ,expt = 0;
 	int info[ITEM_LEN];
 	info[user_id] = id;
+	info[gender] = gd;
 	for(int i = info_wealth; i <= info_health; ++i)
 		info[i] = rand() % 100 + 1;
 	
@@ -225,6 +225,7 @@ PersonInfoPtr	PersonInfo::generateOnePerson(int id, int gd)
 	{
 		info[min_expertation]	=	rand()%10000 + 1;
 	}
+	else		info[min_expertation] = 0;
 	PersonInfoPtr	pPerson	=	std::shared_ptr<PersonInfo>(new PersonInfo(info));
 	return	pPerson;
 }
@@ -233,17 +234,15 @@ std::string PersonInfo::to_string() const
 {
 	std::stringstream ss;
 	if(at(gender))
-	{
 		ss<< "M:";
-	}
 	else
-	{
 		ss<<"F:";
-	}
-	for(int i = 0; i < ITEM_LEN; ++i)
+	for(int i = 0; i < gender; ++i)
 	{
 			ss<<m_arrDetails[i];
-			if(i != ITEM_LEN -1)
+			if ( i==0 )
+				ss<<" INFO:";
+			if(i != gender -1)
 				ss<<",";
 	}
 	return ss.str();
@@ -273,7 +272,7 @@ void			PersonInfo::dumpPairsToFile(BGPairsPtr ps, const std::string & file)
 		PersonInfoPtr pGirl	=	(*itPair).second;
 		if( pBoy && pGirl )
 		{
-			fWrite<<pBoy->to_string();
+			fWrite<<pBoy->to_string()<<"<--->";
 			fWrite<<pGirl->to_string()<<std::endl;
 		}
 		else if( !pBoy )

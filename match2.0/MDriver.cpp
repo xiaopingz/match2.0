@@ -9,16 +9,17 @@ BGPairsPtr	MDriver::makeAllPairs(PersonGroupPtr boys, PersonGroupPtr girls)
 	while( boys->size() && girls->size() )
 	{
 		BGPair	onePair	=	makeOnePair(boys,girls);	//	一次配对
-		pBGPairs->push_back(onePair);					//将结果放入BGPairs当中
-		PersonGroup::iterator	it	=	std::find(boys->begin(),boys->end(),onePair.first);	//查找已配对的男性的位置
-		if(it!=boys->end())
+		if ( onePair.first && onePair.second )
 		{
 			++count;
-			boys->erase(it);		//删除该男性信息
+			pBGPairs->push_back(onePair);
+			PersonGroup::iterator	it	=	std::find(boys->begin(),boys->end(),onePair.first);	//查找已配对的男性的位置,删除已配对
+			boys->erase(it);
+			it	=	std::find(girls->begin(),girls->end(),onePair.second);
+			girls->erase(it);
 		}
-		it	=	std::find(girls->begin(),girls->end(),onePair.second);		//查找已配对的女性的位置
-		if( it!=girls->end() )
-			girls->erase(it);		//	删除该女性信息
+		if ( !onePair.second )
+			break;
 	}
 	std::cout<<"-----"<<count<<" pairs have be matched successfully!"<<std::endl;
 	return	pBGPairs;
@@ -65,10 +66,11 @@ BGPair		MDriver::makeOnePair(PersonGroupPtr boys, PersonGroupPtr girls)
 		if (!boyMatched)
 		{	//配对失败
 			(*pMapGB)[girlMatched]->clear();
-			pMapGB->erase(girlMatched);		
+			pMapGB->erase(girlMatched);	
+			girlMatched	= NULL;
 		}
-	} while (!boyMatched && pMapGB->size());	//配对失败，则进行下一个。直到配对成功或map为空（所有候选女性都不能配对）
-	
+	} while (!boyMatched && pMapGB->size());	//配对失败，则进行下一个。直到配对成功或map为空（此轮匹配中，所有候选女性都不能配对）
+
 	return std::make_pair(boyMatched,girlMatched);
 }
 

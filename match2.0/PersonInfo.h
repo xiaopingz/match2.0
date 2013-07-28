@@ -43,16 +43,19 @@ public:
 	int		getPersonGenger();
 	int		getUsrid();
 	
-	PersonInfoPtr 	selectTheBestOne(PersonGroupPtr group);	//选择另一性别组中最满意的人
+	//关于选择最优对象的一组函数，下面几个函数都是来支持第一个函数的，细分一下，使得逻辑更清晰，调试更方便。
+	PersonInfoPtr 	selectTheBestOne(PersonGroupPtr group);	
 	PersonInfoPtr	selectSatBiggerThanExp(PersonGroupPtr group);	//男性候选人中降序，有满意度大于等于女性期望的1.5倍，则选择该男性
 	int				isNoBestOne(PersonGroupPtr group);	//是否，男性候选人的所有满意度都小于女性期望值
 	PersonGroupPtr	selectMaxSatDegree(PersonGroupPtr group);
 	static	PersonGroupPtr	selectMaxSum(PersonGroupPtr group);
 	static	PersonInfoPtr	selectMinId(PersonGroupPtr group);
 	
+	//快速获得用户各种属性（封装和复用）
 	inline int &     at(ptem_t i){return m_arrDetails[i];}
 	inline const int &     at(ptem_t i)const {return m_arrDetails[i];}
 	
+	//针对初赛代码的优化：对于多次重复的代码，进行了简单的封装。
 	std::string			to_string() const ;
 
 	static PersonGroupPtr	readFromFile(const std::string & file);	//从文件中读取用户信息

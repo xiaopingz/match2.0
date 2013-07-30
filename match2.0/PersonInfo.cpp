@@ -65,17 +65,17 @@ PersonInfoPtr 	PersonInfo::selectTheBestOne(PersonGroupPtr group)
 PersonInfoPtr	PersonInfo::selectSatBiggerThanExp(PersonGroupPtr group)
 {
 	PersonGroup::size_type ix;
-	for ( ix=group->size()-1;ix>=0;--ix )
+	for ( ix=group->size();ix>0;--ix )
 	{
 		int tmpDegree, standard;
 		standard	=	m_mixExpertation*1.5;
-		tmpDegree	=	getSatDegree((*group)[ix]);
+		tmpDegree	=	getSatDegree((*group)[ix-1]);
 		if ( tmpDegree>=standard )
 		{
-			return (*group)[ix];
+			return (*group)[ix-1];
 		}
 	}
-	if ( ix<0 )
+	if ( ix==0 )
 		return NULL;
 }
 
@@ -184,43 +184,6 @@ PersonGroupPtr  PersonInfo::readFromFile(const std::string & file)
 	return	pPersonGroup;
 }
 
-//PersonGroupPtr	PersonInfo::generateRandomPersons(int num,int gender)
-//{
-//	PersonGroupPtr	pPersonGroup	=	std::make_shared<PersonGroup>();
-//	for( int i = 0;i<num;++i )
-//	{
-//		PersonInfoPtr	pPerson	=	generateOnePerson(i,gender);
-//		pPersonGroup->push_back(pPerson);
-//	}
-//	return	pPersonGroup;
-//}
-//
-//PersonInfoPtr	PersonInfo::generateOnePerson(int id, int gender)
-//{
-//	int w, l, c, rw, rl, rc;
-//	w	=	rand()%100 + 1;	//生成1~100的随机数
-//	l	=	rand()%100 + 1;
-//	c	=	rand()%100 + 1;
-//	rw	=	rand()%98  + 1;	//生成1~98的随机数
-//	rl	=	rand()%(99-rw) + 1;
-//	rc	=	100 - rw - rl;
-//	PersonInfoPtr	pPerson	=	std::make_shared<PersonInfo>(id,w,l,c,rw,rl,rc,gender);
-//	return	pPerson;
-//}
-//
-//PersonInfoPtr	PersonInfo::inputOnePerson()
-//{
-//	PersonInfoPtr pPerson;
-//	int w, l, c, rw, rl, rc,gender;
-//	std::cout<<"Please int the person's information (7 numbers):"<<std::endl;
-//	std::cin>>w>>l>>c>>rw>>rl>>rc>>gender;
-//	if( w<100 && l<100 && c<100 && rw<99 && rl<99 && rc<98 && rw+rl+rc==100 && gender==1 || gender==0 )
-//		pPerson =	std::make_shared<PersonInfo>(-1,w,l,c,rw,rl,rc,gender);
-//	else
-//		pPerson	=	NULL;
-//	return pPerson;
-//}
-
 void			PersonInfo::showPairs(BGPairsPtr ps)
 {
 	std::vector<BGPair>::iterator itPair;
@@ -244,8 +207,15 @@ void			PersonInfo::dumpPairsToFile(BGPairsPtr ps, const std::string & file)
 	{
 		PersonInfoPtr pBoy	=	(*itPair).first;
 		PersonInfoPtr pGirl	=	(*itPair).second;
-		fWrite<<"M:"<<pBoy->m_userID<<" INFO:"<<pBoy->m_info_wealth<<","<<pBoy->m_info_look<<","<<pBoy->m_info_charactor<<","<<pBoy->m_info_health<<","<<pBoy->m_ratio_wealth<<","<<pBoy->m_ratio_look<<","<<pBoy->m_ratio_charactor<<","<<pBoy->m_ratio_health<<"<--->";
-		fWrite<<" F:"<<pGirl->m_userID<<" INFO:"<<pGirl->m_info_wealth<<","<<pGirl->m_info_look<<","<<pGirl->m_info_charactor<<","<<pGirl->m_info_health<<","<<pGirl->m_ratio_wealth<<","<<pGirl->m_ratio_look<<","<<pGirl->m_ratio_charactor<<","<<pGirl->m_ratio_health<<std::endl;
+		if( pBoy && pGirl )
+		{
+			fWrite<<"M:"<<pBoy->m_userID<<" INFO:"<<pBoy->m_info_wealth<<","<<pBoy->m_info_look<<","<<pBoy->m_info_charactor<<","<<pBoy->m_info_health<<","<<pBoy->m_ratio_wealth<<","<<pBoy->m_ratio_look<<","<<pBoy->m_ratio_charactor<<","<<pBoy->m_ratio_health<<"<--->";
+			fWrite<<" F:"<<pGirl->m_userID<<" INFO:"<<pGirl->m_info_wealth<<","<<pGirl->m_info_look<<","<<pGirl->m_info_charactor<<","<<pGirl->m_info_health<<","<<pGirl->m_ratio_wealth<<","<<pGirl->m_ratio_look<<","<<pGirl->m_ratio_charactor<<","<<pGirl->m_ratio_health<<std::endl;
+		}
+		else if( !pBoy )
+			fWrite<<"NONE"<<"<--->"<<" F:"<<pGirl->m_userID<<" INFO:"<<pGirl->m_info_wealth<<","<<pGirl->m_info_look<<","<<pGirl->m_info_charactor<<","<<pGirl->m_info_health<<","<<pGirl->m_ratio_wealth<<","<<pGirl->m_ratio_look<<","<<pGirl->m_ratio_charactor<<","<<pGirl->m_ratio_health<<std::endl;
+		else
+			fWrite<<"M:"<<pBoy->m_userID<<" INFO:"<<pBoy->m_info_wealth<<","<<pBoy->m_info_look<<","<<pBoy->m_info_charactor<<","<<pBoy->m_info_health<<","<<pBoy->m_ratio_wealth<<","<<pBoy->m_ratio_look<<","<<pBoy->m_ratio_charactor<<","<<pBoy->m_ratio_health<<"<--->"<<" NONE"<<std::endl;
 	}
 	fWrite.close();
 }

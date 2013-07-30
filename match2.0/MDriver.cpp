@@ -10,9 +10,11 @@ BGPairsPtr	MDriver::makeAllPairs(PersonGroupPtr boys, PersonGroupPtr girls)
 		BGPair	onePair	=	makeOnePair(boys,girls);	//	一次配对
 		pBGPairs->push_back(onePair);					//将结果放入BGPairs当中
 		PersonGroup::iterator	it	=	std::find(boys->begin(),boys->end(),onePair.first);	//查找已配对的男性的位置
-		boys->erase(it);		//删除该男性信息
+		if(it!=boys->end())
+			boys->erase(it);		//删除该男性信息
 		it	=	std::find(girls->begin(),girls->end(),onePair.second);		//查找已配对的女性的位置
-		girls->erase(it);		//	删除该女性信息
+		if( it!=girls->end() )
+			girls->erase(it);		//	删除该女性信息
 	}
 	return	pBGPairs;
 }

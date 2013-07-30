@@ -36,19 +36,16 @@ public:
 	
 	
 	static PersonGroupPtr	readFromFile(const std::string & file);	//从文件中读取用户信息
-	//static PersonGroupPtr	generateRandomPersons(int num, int gender);	//产生随机信息的用户，num为需产生的个数，gender为性别
-	//static PersonInfoPtr	generateOnePerson(int id, int gender);
-	//static PersonInfoPtr	inputOnePerson();
-	
+
 	static void			showPairs(BGPairsPtr ps);
 	static void			dumpPairsToFile(BGPairsPtr ps, const std::string & file);
 	
 protected:
 	int m_userID;
-	int m_info_wealth;		//本人财富: 取值1~100
-	int m_info_look;		//本人样貌：取值1~100
-	int m_info_charactor;	//本人品格：取值1~100
-	int m_info_health;		//本人健康：取值1~100
+	int m_info_wealth;		//本人属性
+	int m_info_look;		
+	int m_info_charactor;	
+	int m_info_health;		
 	int m_ratio_wealth;
 	int m_ratio_look;
 	int m_ratio_charactor;

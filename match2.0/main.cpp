@@ -15,7 +15,8 @@ void main()
 	while(1)
 	{
 		srand(time(NULL));
-		PersonGroupPtr	pPGMale,pPGFemale;
+		PersonGroupPtr	pPGMale	=	std::shared_ptr<PersonGroup>(new PersonGroup());
+		PersonGroupPtr	pPGFemale	=	std::shared_ptr<PersonGroup>(new PersonGroup());
 		int input;
 
 		showStartInfo();

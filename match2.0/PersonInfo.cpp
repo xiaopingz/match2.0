@@ -152,7 +152,7 @@ PersonInfoPtr	PersonInfo::selectMinId(PersonGroupPtr group)
 
 PersonGroupPtr  PersonInfo::readFromFile(const std::string & file)
 {
-	PersonGroupPtr	pPersonGroup	=	std::make_shared<PersonGroup>();
+	PersonGroupPtr	pPersonGroup	=	std::shared_ptr<PersonGroup>(new PersonGroup());
 	std::ifstream	fRead;
 	fRead.open(file);
 	if( !fRead.good() )
@@ -163,9 +163,9 @@ PersonGroupPtr  PersonInfo::readFromFile(const std::string & file)
 	int gender,id,w,l,c,h,rw,rl,rc,rh,me=0;
 	char t;		//	¶ÁÈ¡·ûºÅ','
 
-	if( file.find("female.txt")!=std::string::npos )
+	if( file.find("2_female.txt")!=std::string::npos )
 		gender	=	0;		// female
-	else if( file.find("male.txt")!=std::string::npos )
+	else if( file.find("2_male.txt")!=std::string::npos )
 		gender	=	1;		//male
 
 	while( !fRead.eof() )

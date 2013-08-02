@@ -184,6 +184,36 @@ PersonGroupPtr  PersonInfo::readFromFile(const std::string & file)
 	return	pPersonGroup;
 }
 
+PersonGroupPtr	PersonInfo::generateRandomPersons(int num,int gender)
+{
+	PersonGroupPtr	pPersonGroup	=	std::make_shared<PersonGroup>();
+	for( int i = 0;i<num;++i )
+	{
+		PersonInfoPtr	pPerson	=	generateOnePerson(i,gender);
+		pPersonGroup->push_back(pPerson);
+	}
+	return	pPersonGroup;
+}
+
+PersonInfoPtr	PersonInfo::generateOnePerson(int id, int gender)
+{
+	int w, l, c, h, rw, rl, rc ,rh ,expt = 0;
+	w	=	rand()%100 + 1;	//生成1~100的随机数
+	l	=	rand()%100 + 1;
+	c	=	rand()%100 + 1;
+	h	=	rand()%100 + 1;
+	rw	=	rand()%97  + 1;	//生成1~97的随机数
+	rl	=	rand()%(98-rw) + 1;
+	rc	=	rand()%(99-rw-rl) + 1;
+	rh	=	100 - rw - rl;
+	if ( gender==0 )
+	{
+		expt	=	rand()%10000 + 1;
+	}
+	PersonInfoPtr	pPerson	=	std::shared_ptr<PersonInfo>(new PersonInfo(id,w,l,c,h,rw,rl,rc,rh,gender,expt));
+	return	pPerson;
+}
+
 void			PersonInfo::showPairs(BGPairsPtr ps)
 {
 	std::vector<BGPair>::iterator itPair;
@@ -191,9 +221,9 @@ void			PersonInfo::showPairs(BGPairsPtr ps)
 	{
 		PersonInfoPtr pBoy	=	(*itPair).first;
 		PersonInfoPtr pGirl	=	(*itPair).second;
-		if ( pGirl->getUsrid()==-1 || pBoy->getUsrid()==-1 )
-		{	//此处加了if条件判断，则只显示主角的配对情况。
-			std::cout<<"主角配对 M:"<<pBoy->m_userID<<" INFO:"<<pBoy->m_info_wealth<<","<<pBoy->m_info_look<<","<<pBoy->m_info_charactor<<","<<pBoy->m_info_health<<","<<pBoy->m_ratio_wealth<<","<<pBoy->m_ratio_look<<","<<pBoy->m_ratio_charactor<<","<<pBoy->m_ratio_health<<"<--->";
+		if ( pGirl && pBoy )
+		{	//此处加了if条件判断，则只显示主配对成功的情况。
+			std::cout<<"M:"<<pBoy->m_userID<<" INFO:"<<pBoy->m_info_wealth<<","<<pBoy->m_info_look<<","<<pBoy->m_info_charactor<<","<<pBoy->m_info_health<<","<<pBoy->m_ratio_wealth<<","<<pBoy->m_ratio_look<<","<<pBoy->m_ratio_charactor<<","<<pBoy->m_ratio_health<<"<--->";
 			std::cout<<" F:"<<pGirl->m_userID<<" INFO:"<<pGirl->m_info_wealth<<","<<pGirl->m_info_look<<","<<pGirl->m_info_charactor<<","<<pGirl->m_info_health<<","<<pGirl->m_ratio_wealth<<","<<pGirl->m_ratio_look<<","<<pGirl->m_ratio_charactor<<","<<pGirl->m_ratio_health<<std::endl;
 		}
 	}

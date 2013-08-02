@@ -5,17 +5,22 @@
 BGPairsPtr	MDriver::makeAllPairs(PersonGroupPtr boys, PersonGroupPtr girls)
 {
 	BGPairsPtr	pBGPairs	=	std::make_shared<BGPairs>();
+	int count = 0;
 	while( boys->size() && girls->size() )
 	{
 		BGPair	onePair	=	makeOnePair(boys,girls);	//	一次配对
 		pBGPairs->push_back(onePair);					//将结果放入BGPairs当中
 		PersonGroup::iterator	it	=	std::find(boys->begin(),boys->end(),onePair.first);	//查找已配对的男性的位置
 		if(it!=boys->end())
+		{
+			++count;
 			boys->erase(it);		//删除该男性信息
+		}
 		it	=	std::find(girls->begin(),girls->end(),onePair.second);		//查找已配对的女性的位置
 		if( it!=girls->end() )
 			girls->erase(it);		//	删除该女性信息
 	}
+	std::cout<<"-----"<<count<<" pairs have be matched successfully!"<<std::endl;
 	return	pBGPairs;
 }
 	

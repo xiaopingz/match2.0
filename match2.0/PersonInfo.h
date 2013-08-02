@@ -36,6 +36,8 @@ public:
 	
 	
 	static PersonGroupPtr	readFromFile(const std::string & file);	//从文件中读取用户信息
+	static PersonGroupPtr	generateRandomPersons(int num, int gender);	//产生随机信息的用户，num为需产生的个数，gender为性别
+	static PersonInfoPtr	generateOnePerson(int id, int gender);
 
 	static void			showPairs(BGPairsPtr ps);
 	static void			dumpPairsToFile(BGPairsPtr ps, const std::string & file);

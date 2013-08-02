@@ -1,41 +1,43 @@
 #include "PersonInfo.h"
 #include<fstream>
 #include<iostream>
+#include <sstream>
 
 PersonInfo::PersonInfo()
-	:m_userID(-2),m_info_wealth(0),m_info_look(0),m_info_health(0),m_info_charactor(0),m_ratio_wealth(0),m_ratio_look(0),m_ratio_charactor(0),m_ratio_health(0),m_gender(0),m_mixExpertation(0)
 {
+	memset(m_arrDetails, 0, sizeof(int) * ITEM_LEN);
+	at(user_id) = -2;
 }
 
-PersonInfo::PersonInfo(int uid, int iwealth, int ilook, int icharactor, int ihealth, int rwealth, int rlook, int rcharactor, int rhealth, int igender, int mixExpertation)
-	:m_userID(uid),m_info_wealth(iwealth),m_info_look(ilook),m_info_health(ihealth),m_info_charactor(icharactor),m_ratio_wealth(rwealth),m_ratio_look(rlook),m_ratio_charactor(rcharactor),m_ratio_health(rhealth),m_gender(igender),m_mixExpertation(mixExpertation)
+PersonInfo::PersonInfo(int * items)
 {
+	memcpy((void *)m_arrDetails, items, sizeof(int) * ITEM_LEN);
 }
 
 int		PersonInfo::sumOfInfo()
 {
-	return m_info_charactor+m_info_look+m_info_wealth+m_info_health;
+	return at(info_charactor)+at(info_look)+at(info_wealth)+at(info_health);
 }
 
 int		PersonInfo::getSatDegree(PersonInfoPtr p)
 {
-	int	sd	=	m_ratio_charactor * p->m_info_charactor + m_ratio_look * p->m_info_look + m_ratio_wealth * p->m_info_wealth + m_ratio_health * p->m_ratio_health;
+	int	sd	=	at(ratio_charactor) * p->at(info_charactor) + at(ratio_look) * p->at(info_look) + at(ratio_wealth) * p->at(info_wealth) + at(ratio_health) * p->at(ratio_health);
 	return sd;
 }
 
 int		PersonInfo::getPersonGenger()
 {
-	return	m_gender;
+	return	at(gender);
 }
 
 int		PersonInfo::getUsrid()
 {
-	return m_userID;
+	return at(user_id);
 }
 
 PersonInfoPtr 	PersonInfo::selectTheBestOne(PersonGroupPtr group)
 {
-	if ( m_gender==0 )
+	if ( at(gender)==0 )
 	{
 		PersonInfoPtr	p	=	selectSatBiggerThanExp(group);
 		if ( p )
@@ -68,7 +70,7 @@ PersonInfoPtr	PersonInfo::selectSatBiggerThanExp(PersonGroupPtr group)
 	for ( ix=group->size();ix>0;--ix )
 	{
 		int tmpDegree, standard;
-		standard	=	m_mixExpertation*1.5;
+		standard	=	at(min_expertation)*1.5;
 		tmpDegree	=	getSatDegree((*group)[ix-1]);
 		if ( tmpDegree>=standard )
 		{
@@ -83,7 +85,7 @@ int				PersonInfo::isNoBestOne(PersonGroupPtr group)
 {
 	for ( PersonGroup::iterator it = group->begin();it!=group->end();++it )
 	{
-		if ( getSatDegree(*it)>=m_mixExpertation )
+		if ( getSatDegree(*it)>=at(min_expertation) )
 			return 0;
 	}
 	return 1;
@@ -160,24 +162,36 @@ PersonGroupPtr  PersonInfo::readFromFile(const std::string & file)
 		std::cout<<"Open file: "<<file<<" failed!"<<std::endl;
 		return NULL;
 	}
-	int gender,id,w,l,c,h,rw,rl,rc,rh,me=0;
+	int id,w,l,c,h,rw,rl,rc,rh,me=0;
 	char t;		//	读取符号','
+	int info[ITEM_LEN];
 
 	if( file.find("2_female.txt")!=std::string::npos )
-		gender	=	0;		// female
+		info[gender]	=	0;		// female
 	else if( file.find("2_male.txt")!=std::string::npos )
-		gender	=	1;		//male
+		info[gender]	=	1;		//male
 
+	
 	while( !fRead.eof() )
 	{
-		if( gender==1 )
-			fRead>>id>>t>>w>>t>>l>>t>>c>>t>>h>>t>>rw>>t>>rl>>t>>rc>>t>>rh;
-		else
-			fRead>>id>>t>>w>>t>>l>>t>>c>>t>>h>>t>>rw>>t>>rl>>t>>rc>>t>>rh>>t>>me;
-
+		fRead>>info[user_id] >> t >> 
+			info[info_wealth] >> t>>
+			info[info_look] >>t >>
+			info[info_charactor] >> t >>
+			info[info_health] >> t >>
+			info[ratio_wealth] >> t >>
+			info[ratio_look] >> t >>
+			info[ratio_charactor] >> t >>
+			info[ratio_health];
+		
+		if( info[gender]!=1 )
+		{
+			fRead>>t>>info[min_expertation];
+		}
 		if(fRead.bad()||fRead.fail())
 			continue;
-		PersonInfoPtr	pPerson	=	std::shared_ptr<PersonInfo>(new PersonInfo(id,w,l,c,h,rw,rl,rc,rh,gender,me));
+		
+		PersonInfoPtr	pPerson	=	std::shared_ptr<PersonInfo>(new PersonInfo(info));
 		pPersonGroup->push_back(pPerson);
 	}
 	fRead.close();
@@ -195,25 +209,45 @@ PersonGroupPtr	PersonInfo::generateRandomPersons(int num,int gender)
 	return	pPersonGroup;
 }
 
-PersonInfoPtr	PersonInfo::generateOnePerson(int id, int gender)
+PersonInfoPtr	PersonInfo::generateOnePerson(int id, int gd)
 {
 	int w, l, c, h, rw, rl, rc ,rh ,expt = 0;
-	w	=	rand()%100 + 1;	//生成1~100的随机数
-	l	=	rand()%100 + 1;
-	c	=	rand()%100 + 1;
-	h	=	rand()%100 + 1;
-	rw	=	rand()%97  + 1;	//生成1~97的随机数
-	rl	=	rand()%(98-rw) + 1;
-	rc	=	rand()%(99-rw-rl) + 1;
-	rh	=	100 - rw - rl;
-	if ( gender==0 )
+	int info[ITEM_LEN];
+	info[user_id] = id;
+	for(int i = info_wealth; i <= info_health; ++i)
+		info[i] = rand() % 100 + 1;
+	
+	info[ratio_wealth]	=	rand()%97  + 1;	//生成1~97的随机数
+	info[ratio_look]	=	rand()%(98-info[ratio_wealth]) + 1;
+	info[ratio_charactor]	=	rand()%(99-info[ratio_wealth]-info[ratio_look]) + 1;
+	info[ratio_health]	=	100 - info[ratio_wealth] - info[ratio_look] - info[ratio_charactor];
+	if ( gd==0 )
 	{
-		expt	=	rand()%10000 + 1;
+		info[min_expertation]	=	rand()%10000 + 1;
 	}
-	PersonInfoPtr	pPerson	=	std::shared_ptr<PersonInfo>(new PersonInfo(id,w,l,c,h,rw,rl,rc,rh,gender,expt));
+	PersonInfoPtr	pPerson	=	std::shared_ptr<PersonInfo>(new PersonInfo(info));
 	return	pPerson;
 }
 
+std::string PersonInfo::to_string() const
+{
+	std::stringstream ss;
+	if(at(gender))
+	{
+		ss<< "M:";
+	}
+	else
+	{
+		ss<<"F:";
+	}
+	for(int i = 0; i < ITEM_LEN; ++i)
+	{
+			ss<<m_arrDetails[i];
+			if(i != ITEM_LEN -1)
+				ss<<",";
+	}
+	return ss.str();
+}
 void			PersonInfo::showPairs(BGPairsPtr ps)
 {
 	std::vector<BGPair>::iterator itPair;
@@ -223,8 +257,8 @@ void			PersonInfo::showPairs(BGPairsPtr ps)
 		PersonInfoPtr pGirl	=	(*itPair).second;
 		if ( pGirl && pBoy )
 		{	//此处加了if条件判断，则只显示主配对成功的情况。
-			std::cout<<"M:"<<pBoy->m_userID<<" INFO:"<<pBoy->m_info_wealth<<","<<pBoy->m_info_look<<","<<pBoy->m_info_charactor<<","<<pBoy->m_info_health<<","<<pBoy->m_ratio_wealth<<","<<pBoy->m_ratio_look<<","<<pBoy->m_ratio_charactor<<","<<pBoy->m_ratio_health<<"<--->";
-			std::cout<<" F:"<<pGirl->m_userID<<" INFO:"<<pGirl->m_info_wealth<<","<<pGirl->m_info_look<<","<<pGirl->m_info_charactor<<","<<pGirl->m_info_health<<","<<pGirl->m_ratio_wealth<<","<<pGirl->m_ratio_look<<","<<pGirl->m_ratio_charactor<<","<<pGirl->m_ratio_health<<std::endl;
+			std::cout<<pBoy->to_string()<<"<--->";
+			std::cout<<pGirl->to_string()<<std::endl;
 		}
 	}
 }
@@ -239,13 +273,13 @@ void			PersonInfo::dumpPairsToFile(BGPairsPtr ps, const std::string & file)
 		PersonInfoPtr pGirl	=	(*itPair).second;
 		if( pBoy && pGirl )
 		{
-			fWrite<<"M:"<<pBoy->m_userID<<" INFO:"<<pBoy->m_info_wealth<<","<<pBoy->m_info_look<<","<<pBoy->m_info_charactor<<","<<pBoy->m_info_health<<","<<pBoy->m_ratio_wealth<<","<<pBoy->m_ratio_look<<","<<pBoy->m_ratio_charactor<<","<<pBoy->m_ratio_health<<"<--->";
-			fWrite<<" F:"<<pGirl->m_userID<<" INFO:"<<pGirl->m_info_wealth<<","<<pGirl->m_info_look<<","<<pGirl->m_info_charactor<<","<<pGirl->m_info_health<<","<<pGirl->m_ratio_wealth<<","<<pGirl->m_ratio_look<<","<<pGirl->m_ratio_charactor<<","<<pGirl->m_ratio_health<<std::endl;
+			fWrite<<pBoy->to_string();
+			fWrite<<pGirl->to_string()<<std::endl;
 		}
 		else if( !pBoy )
-			fWrite<<"NONE"<<"<--->"<<" F:"<<pGirl->m_userID<<" INFO:"<<pGirl->m_info_wealth<<","<<pGirl->m_info_look<<","<<pGirl->m_info_charactor<<","<<pGirl->m_info_health<<","<<pGirl->m_ratio_wealth<<","<<pGirl->m_ratio_look<<","<<pGirl->m_ratio_charactor<<","<<pGirl->m_ratio_health<<std::endl;
+			fWrite<<"NONE"<<"<--->"<<pGirl->to_string()<<std::endl;
 		else
-			fWrite<<"M:"<<pBoy->m_userID<<" INFO:"<<pBoy->m_info_wealth<<","<<pBoy->m_info_look<<","<<pBoy->m_info_charactor<<","<<pBoy->m_info_health<<","<<pBoy->m_ratio_wealth<<","<<pBoy->m_ratio_look<<","<<pBoy->m_ratio_charactor<<","<<pBoy->m_ratio_health<<"<--->"<<" NONE"<<std::endl;
+			fWrite<<pBoy->to_string()<<"<--->"<<" NONE"<<std::endl;
 	}
 	fWrite.close();
 }

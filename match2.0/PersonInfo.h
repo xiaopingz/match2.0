@@ -19,8 +19,24 @@ typedef std::shared_ptr<BGPairs>	BGPairsPtr;
 class PersonInfo
 {
 public:
+	enum ptem_t{
+		user_id = 0,
+		info_wealth,
+		info_look,
+		info_charactor,
+		info_health,
+		ratio_wealth,
+		ratio_look,
+		ratio_charactor,
+		ratio_health,  //对配偶四项指标的期望百分比，四者和为100，各自取值1~97
+		gender,   //1:male; 0:female
+		min_expertation, //对异性满意度的最低期望值( 男性用户则为0 ）
+		ITEM_LEN
+	};
+
+public:
 	PersonInfo();
-	PersonInfo(int uid, int iwealth, int ilook, int icharactor, int ihealth, int rwealth, int rlook, int rcharactor, int rhealth, int igender, int mixExpertation);
+	PersonInfo(int * items);
 	
 	int		sumOfInfo();
 	int		getSatDegree(PersonInfoPtr p);		//计算一个人对另一个人的满意度
@@ -34,25 +50,21 @@ public:
 	static	PersonGroupPtr	selectMaxSum(PersonGroupPtr group);
 	static	PersonInfoPtr	selectMinId(PersonGroupPtr group);
 	
+	inline int &     at(ptem_t i){return m_arrDetails[i];}
+	inline const int &     at(ptem_t i)const {return m_arrDetails[i];}
 	
+	std::string			to_string() const ;
+
 	static PersonGroupPtr	readFromFile(const std::string & file);	//从文件中读取用户信息
 	static PersonGroupPtr	generateRandomPersons(int num, int gender);	//产生随机信息的用户，num为需产生的个数，gender为性别
 	static PersonInfoPtr	generateOnePerson(int id, int gender);
 
+
 	static void			showPairs(BGPairsPtr ps);
 	static void			dumpPairsToFile(BGPairsPtr ps, const std::string & file);
 	
+	
 protected:
-	int m_userID;
-	int m_info_wealth;		//本人属性
-	int m_info_look;		
-	int m_info_charactor;	
-	int m_info_health;		
-	int m_ratio_wealth;
-	int m_ratio_look;
-	int m_ratio_charactor;
-	int m_ratio_health;		//对配偶四项指标的期望百分比，四者和为100，各自取值1~97
-	int m_gender;			//1:male; 0:female
-	int m_mixExpertation;	//对异性满意度的最低期望值( 男性用户则为0 ）
+	int m_arrDetails[ITEM_LEN];
 };//end class PersonInfo;
 #endif

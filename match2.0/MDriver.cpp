@@ -83,7 +83,7 @@ PersonGroupPtr		MDriver::getHotestGirl(std::shared_ptr<MapGB>	pMapGB)
 	for ( it=pMapGB->begin();it!=pMapGB->end();++it )
 	{
 		ixTmp	=	(it->second)->size();
-		if ( ixTmp>ixMax || ixMax==ixTmp )
+		if ( ixTmp>=ixMax )
 		{
 			if ( ixTmp>ixMax )
 			{

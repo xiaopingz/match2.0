@@ -16,11 +16,11 @@ void main()
 	{	
 		srand(time(NULL));
 		PersonGroupPtr	pPGMale, pPGFemale;
-		int		input;
+		std::string		input;
 		
 		showStartInfo();
 		std::cin>>input;
-		if( input==1 )
+		if( input=="1" )
 		{
 			int nMale, nFemale;
 			std::cout<<"Please input the numbers of Male & Female to match:"<<std::endl;
@@ -28,12 +28,12 @@ void main()
 			pPGMale    =  PersonInfo::generateRandomPersons(nMale,1);
 			pPGFemale  =  PersonInfo::generateRandomPersons(nFemale,0);
 		}
-		else if( input==2 )
+		else if( input=="2" )
 		{
 			pPGMale		=	PersonInfo::readFromFile("../2_male.txt");
 			pPGFemale	=	PersonInfo::readFromFile("../2_female.txt");
 		}
-		else if( input==0 )
+		else if( input=="0" )
 			break;
 		else
 		{

@@ -67,10 +67,10 @@ PersonInfoPtr 	PersonInfo::selectTheBestOne(PersonGroupPtr group)
 PersonInfoPtr	PersonInfo::selectSatBiggerThanExp(PersonGroupPtr group)
 {
 	PersonGroup::size_type ix;
+	double tmpDegree, standard;
+	standard	=	1.5*at(min_expertation);
 	for ( ix=group->size();ix>0;--ix )
 	{
-		double tmpDegree, standard;
-		standard	=	at(min_expertation)*1.5;
 		tmpDegree	=	getSatDegree((*group)[ix-1]);
 		if ( tmpDegree>=standard )
 		{
@@ -100,7 +100,7 @@ PersonGroupPtr	PersonInfo::selectMaxSatDegree(PersonGroupPtr group)
 	for ( itNow=group->begin();itNow!=group->end();++itNow )
 	{
 		tmpDegree	=	getSatDegree(*itNow);
-		if ( tmpDegree>highestDegree || tmpDegree==highestDegree )
+		if ( tmpDegree>=highestDegree )
 		{
 			if ( tmpDegree>highestDegree )
 			{
@@ -122,7 +122,7 @@ PersonGroupPtr	PersonInfo::selectMaxSum(PersonGroupPtr group)
 	for ( itNow=group->begin();itNow!=group->end();++itNow )
 	{
 		iSumNow	=	(*itNow)->sumOfInfo();
-		if ( iSumNow>iSumMax || iSumNow==iSumMax )
+		if ( iSumNow>=iSumMax )
 		{
 			if ( iSumNow>iSumMax )
 			{
@@ -138,7 +138,7 @@ PersonGroupPtr	PersonInfo::selectMaxSum(PersonGroupPtr group)
 PersonInfoPtr	PersonInfo::selectMinId(PersonGroupPtr group)
 {
 	PersonGroup::iterator	itNow, itBest;
-	int	iIdBest=200, iIdNow=200;
+	int	iIdBest=INT_MAX, iIdNow=INT_MAX;
 
 	for ( itNow=group->begin();itNow!=group->end();++itNow )
 	{
